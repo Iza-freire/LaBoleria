@@ -41,6 +41,6 @@ export async function getOrders(req, res) {
 
     } catch (error) {
         console.log(error);
-        return res.status(500).json({ message: "Erro ao buscar pedidos." });
+        return res.status(500).json(error);
     }
 }
