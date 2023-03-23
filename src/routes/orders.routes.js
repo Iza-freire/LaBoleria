@@ -1,10 +1,9 @@
 import { Router } from "express";
-import { validShema } from "../middlewares/schemaValidor.js"
-import ordersShemas from "../schemas/ordersShemas"
+import { validShemaOrder } from "../middlewares/schemaValidorOrder.js";
+import { createOrder } from "../controllers/order.controller.js"
 
 const router = Router();
 
-router.post("/order", validShema(ordersShemas), () => {}),
-router.get("/orders", validShema(ordersShemas), () => {}),
-router.get("/orders/:id", validShema(ordersShemas), () => {}),
-router.get("/clients/:id/orders", validShema(ordersShemas), () => {})
+router.post("/", validShemaOrder, createOrder);
+
+export default router;
