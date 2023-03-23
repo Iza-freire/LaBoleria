@@ -1,7 +1,9 @@
-import { Router } from "express";
-import { validShema } from "../middlewares/schemaValidor.js"
-import clientsShemas from "../schemas/clientsShemas.js"
+import express from "express";
+import { createClient } from "../controllers/clients.controller.js";
+import { validShemaClients } from "../middlewares/schemaValidorClients.js";
 
-const router = Router();
+const router = express.Router();
 
-router.post("/clients", validShema(clientsShemas))
+router.post("/", validShemaClients, createClient);
+
+export default router;
