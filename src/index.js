@@ -13,7 +13,7 @@ app.use(cors());
 
 app.use("/cakes", cakesRouter);
 app.use("/clients", clientsRouter);
-app.use("/order", ordersRouter);
+app.use(ordersRouter);
 
 const port = process.env.PORT;
 

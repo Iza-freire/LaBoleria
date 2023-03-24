@@ -44,3 +44,51 @@ export async function getOrders(req, res) {
         return res.status(500).json(error);
     }
 }
+
+
+export async function getOrderById(req, res) {
+    const orderId = req.params.id;
+
+    try {
+        const orderQuery = `SELECT orders.id AS "orderId", orders."createdAt", orders.quantity, orders."totalPrice",
+                            cakes.id AS "cakeId", cakes.name AS "cakeName", cakes.price, cakes.description, cakes.image,
+                            clients.id AS "clientId", clients.name AS "clientName", clients.address, clients.phone 
+                            FROM orders
+                            JOIN clients ON "clientId" = clients.id
+                            JOIN cakes ON "cakeId" = cakes.id
+                            WHERE orders.id = $1`;
+
+        const result = await db.query(orderQuery, [orderId]);
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: "Order not found." });
+        }
+
+        const row = result.rows[0];
+        const order = {
+            orderId: row.orderId,
+            createdAt: row.createdAt,
+            quantity: row.quantity,
+            totalPrice: row.totalPrice,
+            client: {
+                id: row.clientId,
+                name: row.clientName,
+                address: row.address,
+                phone: row.phone,
+            },
+            cake: {
+                id: row.cakeId,
+                name: row.cakeName,
+                price: row.price,
+                description: row.description,
+                image: row.image,
+            },
+        };
+        return res.status(200).json(order);
+    } catch (error) {
+        console.log(error);
+        return res.sendStatus(500);
+    }
+}
+
+
