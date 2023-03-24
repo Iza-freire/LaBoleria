@@ -92,3 +92,44 @@ export async function getOrderById(req, res) {
 }
 
 
+export async function getClientOrders(req, res) {
+    try {
+        const { id } = req.params;
+
+        const clientQuery = `SELECT id, name, address, phone FROM clients WHERE id = $1`;
+        const clientResult = await db.query(clientQuery, [id]);
+        if (clientResult.rowCount === 0) {
+            return res.status(404).json({ error: "Client not found" });
+        }
+        const client = clientResult.rows[0];
+
+        const ordersQuery = `SELECT orders.id AS "orderId", orders.quantity, orders."createdAt", orders."totalPrice", cakes.name AS "cakeName"
+                            FROM orders
+                            JOIN clients ON orders."clientId" = clients.id
+                            JOIN cakes ON orders."cakeId" = cakes.id
+                            WHERE clients.id = $1`;
+
+        const ordersResult = await db.query(ordersQuery, [id]);
+        
+        const orders = ordersResult.rows.map((row) => ({
+            orderId: row.orderId,
+            quantity: row.quantity,
+            createdAt: row.createdAt,
+            totalPrice: row.totalPrice,
+            cakeName: row.cakeName,
+        }));
+
+        return res.status(200).json({
+            client: {
+                id: client.id,
+                name: client.name,
+                address: client.address,
+                phone: client.phone,
+            },
+            orders,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json(error);
+    }
+}
